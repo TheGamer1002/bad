@@ -19,13 +19,69 @@ class App < Sinatra::Base
     'Summer Instititue Starter App'
   end
 
-  get '/examples' do
-    erb(:examples)
+  def accounts
+    Process.groups.map do |group_id|
+      Etc.getgrgid(group_id).name
+    end.select do |group|
+      group.start_with?('P')
+    end
+  end
+
+  post '/render/frames' do
+    # params[]
+    args = ['-A', params[:account]]
+    script = "#{__dir__}/scripts/render_frames.sh"
+    output = `/bin/sbatch #{args.join ' '} #{script} 2>&1`
+
+    session[:flash] = { info: "Submitted job with output #{output}" }
+
+    redirect(url("/projects/#{File.basename(params[:project_directory])}"))
+  end
+
+  def project_dirs
+    Dir.children(projects_root).select do |path|
+      Pathname.new("#{projects_root}/#{path}").directory?
+    end.sort_by(&:to_s)
+  end
+
+  def blend_files
+    Dir.glob("#{__dir__}/blend_files/*.blend")
   end
 
   get '/' do
     logger.info('requsting the index')
     @flash = session.delete(:flash) || { info: 'Welcome to Summer Institute!' }
     erb(:index)
+  end
+
+  get '/projects/:name' do
+    if params[:name] == 'new'
+      erb(:new_project)
+    else
+      @directory = Pathname.new("#{projects_root}/#{params[:name]}")
+      @flash = session.delete(:flash)
+
+      if @directory.directory? && @directory.readable?
+        erb(:show_project)
+      else
+        session[:flash] = { danger: "#{params[:name]} does not exist. Maybe try recreating it?" }
+        redirect(url('/'))
+      end
+
+    end
+  end
+
+  # helper function for the parent directory of all projects.
+  def projects_root
+    "#{__dir__}/projects"
+  end
+
+  post '/projects/new' do
+    dir = params[:name].downcase.gsub(' ', '_')
+
+    "#{projects_root}/#{dir}".tap { |d| FileUtils.mkdir_p(d) }
+
+    session[:flash] = { info: "made new project '#{params[:name]}'" }
+    redirect(url("/projects/#{dir}"))
   end
 end

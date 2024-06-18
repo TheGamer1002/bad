@@ -1,0 +1,52 @@
+<form method='post' action="<%= url('/render/frames') %>">
+  <div class="row">
+    <div class="form-group col-6">
+      <label for="account">Account</label>
+      <select class="form-control" name="account">
+        <%- accounts.each do |account| %>
+          <option><%= account %></option>
+        <%- end %>
+      </select>
+      <small class="form-text text-muted">Account to charge for this job.</small>
+    </div>
+  
+    <div class="form-group col-6">
+     <label for="blend_file">.blend File</label>
+     <select class="form-control" name="blend_file">
+      <%- blend_files.each do |blend_file| %>
+        <option value="<%= blend_file %>"><%= File.basename(blend_file) %></option>
+      <%- end %>
+     </select>
+    <small class="form-text text-muted">Blender file to render in .blend format.</small>
+        
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-group col-4">
+    <label for="num_cpus">Number of CPUs</label>
+    <input class="form-control" type="number" name="num_cpus" value="4" min="4" max="48" step="1" />
+    <small class="form-text text-muted">Number of CPUs to allocate for this job. Minimum 4, maximum 48.</small>
+    </div>
+  
+    <div class="form-group col-4">
+  
+    <label for="frame_range">Frame Range</label>
+    <input class="form-control" type="text" name="frame_range" />
+    <small class="form-text text-muted">Frame range to render. 1..n renders frames 1 to n. x,y,z renders just frames x, y, and z.</small>
+    </div>
+  
+    <div class="form-group col-4">
+    <label for="walltime">Walltime</label>
+    <input class="form-control" type="number" name="walltime" value="1" min="1" max="48" step="1" />
+    <small class="form-text text-muted">Walltime in hours. Minimum 1, maximum 48.</small>
+    </div>
+  <!-- hidden field -->
+  <input name="project_directory" type="hidden" value="<%= @directory %>">
+
+
+<div class="row justify-content-md-end my-1">
+  <button type="submit" class="btn btn-primary float-right">Render Frames</button>
+</div>
+</form>
+
