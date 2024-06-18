@@ -32,8 +32,9 @@ class App < Sinatra::Base
     args = ['-A', params[:account]]
     script = "#{__dir__}/scripts/render_frames.sh"
     output = `/bin/sbatch #{args.join ' '} #{script} 2>&1`
+    
 
-    session[:flash] = { info: "Submitted job with output #{output}" }
+    session[:flash] = { info: "Submitted job with output #{output} and args #{args.inspect}" }
 
     redirect(url("/projects/#{File.basename(params[:project_directory])}"))
   end
