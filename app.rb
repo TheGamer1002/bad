@@ -33,7 +33,7 @@ class App < Sinatra::Base
     walltime = format('%02d:00:00', params[:walltime]) # yeah im a gamer
     args = ['-A', params[:account], '-n', params[:num_cpus]]
       .concat(['-t', walltime, '-M', 'pitzer'])
-      .concat(['--parseable', '--export', "BLEND_FILE_PATH=#{params[:blend_file]},OUTPUT_DIR=#{params[:project_directory]},FRAME_RANGE=#{params[:frame_range]}"])
+      .concat(['--parsable', '--export', "BLEND_FILE_PATH=#{params[:blend_file]},OUTPUT_DIR=#{params[:project_directory]},FRAME_RANGE=#{params[:frame_range]}"])
     script = "#{__dir__}/scripts/render_frames.sh"
     output = `/bin/sbatch #{args.join ' '} #{script} 2>&1`
     
