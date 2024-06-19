@@ -32,15 +32,29 @@ class App < Sinatra::Base
     # walltime is passed in in hours, we need to convert it to hh:mm:ss format
     walltime = format('%02d:00:00', params[:walltime]) # yeah im a gamer
     args = ['-A', params[:account], '-n', params[:num_cpus]]
-      .concat(['-t', walltime, '-M', 'pitzer'])
-      .concat(['--parsable', '--export', "BLEND_FILE_PATH=#{params[:blend_file]},OUTPUT_DIR=#{params[:project_directory]},FRAME_RANGE=#{params[:frame_range]}"])
+           .concat(['-t', walltime, '-M', 'pitzer'])
+           .concat(['--parsable', '--export',
+                    "BLEND_FILE_PATH=#{params[:blend_file]},OUTPUT_DIR=#{params[:project_directory]},FRAME_RANGE=#{params[:frame_range]}"])
     script = "#{__dir__}/scripts/render_frames.sh"
     output = `/bin/sbatch #{args.join ' '} #{script} 2>&1`
-    
 
     session[:flash] = { info: "Submitted job with output #{output} and args #{args.inspect}" }
 
     redirect(url("/projects/#{File.basename(params[:project_directory])}"))
+  end
+
+  get '/upload' do
+    erb(:upload)
+  end
+
+  post '/upload' do
+    # upload a .blend file to the blend_files directory
+    if params[:blend_file]
+      FileUtils.mv(params[:blend_file][:tempfile].path, "#{__dir__}/blend_files/#{params[:blend_file][:filename]}")
+      session[:flash] = { info: "uploaded #{params[:blend_file][:filename]}" }
+    else
+      session[:flash] = { danger: 'no file uploaded' }
+    end
   end
 
   def project_dirs
@@ -51,6 +65,10 @@ class App < Sinatra::Base
 
   def blend_files
     Dir.glob("#{__dir__}/blend_files/*.blend")
+  end
+
+  def images(project_name)
+    Dir.glob("#{project_name}/*.png")
   end
 
   get '/' do
@@ -65,6 +83,7 @@ class App < Sinatra::Base
     else
       @directory = Pathname.new("#{projects_root}/#{params[:name]}")
       @flash = session.delete(:flash)
+      @images = images(@directory)
 
       if @directory.directory? && @directory.readable?
         erb(:show_project)
