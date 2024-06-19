@@ -26,21 +26,36 @@ class App < Sinatra::Base
       group.start_with?('P')
     end
   end
-
+  pars = {}
   post '/render/frames' do
+    # convert params to an array type thing
+    puts params.inspect
+
+    if params[:blend_file] == 'Upload new file'
+      pars = params.dup
+      @need_file = true
+      redirect(url('/upload'))
+    end
+    r(params[:blend_file], params[:num_cpus], params[:walltime], params[:account], params[:frame_range],
+      params[:project_directory])
+
+    redirect(url("/projects/#{File.basename(params[:project_directory])}"))
+  end
+  # define the render function with argument params
+  def r(blend_file, num_cpus, walltime, account, frame_range, project_directory)
+    # check if the blend file is "Upload new file"
     # params[]
     # walltime is passed in in hours, we need to convert it to hh:mm:ss format
-    walltime = format('%02d:00:00', params[:walltime]) # yeah im a gamer
-    args = ['-A', params[:account], '-n', params[:num_cpus]]
+    walltime = format('%02d:00:00', walltime) # yeah im a gamer
+    args = ['-A', account, '-n', num_cpus]
            .concat(['-t', walltime, '-M', 'pitzer'])
            .concat(['--parsable', '--export',
-                    "BLEND_FILE_PATH=#{params[:blend_file]},OUTPUT_DIR=#{params[:project_directory]},FRAME_RANGE=#{params[:frame_range]}"])
+                    "BLEND_FILE_PATH=#{blend_file},OUTPUT_DIR=#{project_directory},FRAME_RANGE=#{frame_range}"])
     script = "#{__dir__}/scripts/render_frames.sh"
     output = `/bin/sbatch #{args.join ' '} #{script} 2>&1`
 
     session[:flash] = { info: "Submitted job with output #{output} and args #{args.inspect}" }
-
-    redirect(url("/projects/#{File.basename(params[:project_directory])}"))
+    puts "Submitted job with output #{output} and args #{args.inspect}"
   end
 
   get '/upload' do
@@ -49,12 +64,22 @@ class App < Sinatra::Base
 
   post '/upload' do
     # upload a .blend file to the blend_files directory
-    if params[:blend_file]
-      FileUtils.mv(params[:blend_file][:tempfile].path, "#{__dir__}/blend_files/#{params[:blend_file][:filename]}")
-      session[:flash] = { info: "uploaded #{params[:blend_file][:filename]}" }
-    else
+
+    puts params.inspect
+    unless params[:file] && (tempfile = params[:file][:tempfile]) && (name = params[:file][:filename])
       session[:flash] = { danger: 'no file uploaded' }
+      redirect(url('/upload'))
     end
+    target = "#{__dir__}/blend_files/#{name}"
+    File.open(target, 'wb') { |f| f.write(tempfile.read) }
+    session[:flash] = { info: "uploaded #{params[:file][:filename]}" }
+    pars.merge!(blend_file: name)
+    # redirect to the post
+    @need_file = false
+    r(pars[:blend_file], pars[:num_cpus], pars[:walltime], pars[:account], pars[:frame_range],
+      pars[:project_directory])
+    pars = {}
+    redirect(url('/'))
   end
 
   def project_dirs

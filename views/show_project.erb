@@ -8,9 +8,16 @@
         <%- end -%>
     </div>
   </div>
-</div
+    <a class="carousel-control-prev" href="#blend_image_carousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
 
-
+    <a class="carousel-control-next" href="#blend_image_carousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+</div>
 <form method='post' action="<%= url('/render/frames') %>">
   <div class="row">
     <div class="form-group col-6">
@@ -29,6 +36,7 @@
       <%- blend_files.each do |blend_file| %>
         <option value="<%= blend_file %>"><%= File.basename(blend_file) %></option>
       <%- end %>
+        <option>Upload new file</option>
      </select>
     <small class="form-text text-muted">Blender file to render in .blend format.</small>
         
