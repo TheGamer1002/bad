@@ -133,4 +133,23 @@ class App < Sinatra::Base
     session[:flash] = { info: "made new project '#{params[:name]}'" }
     redirect(url("/projects/#{dir}"))
   end
+
+  post '/render/video' do
+    logger.info("Trying to render video with: #{params.inspect}")
+
+    output_dir = params[:project_directory]
+    frames_per_second = params[:frames_per_second]
+    walltime = format('%02d:00:00', params[:walltime])
+
+    args = ['-J', 'blender-video', '--parsable', '-A', params[:account]]
+    args.concat ['--export', "FRAMES_PER_SEC=#{frames_per_second},OUTPUT_DIR=#{output_dir}"]
+    args.concat ['-n', params[:num_cpus], '-t', walltime, '-M', 'pitzer']
+    args.concat ['--output', "#{output_dir}/video-render-%j.out"]
+    output = `/bin/sbatch #{args.join(' ')}  #{__dir__}/scripts/render_video.sh 2>&1`
+
+    job_id = output.strip.split(';').first
+
+    session[:flash] = { info: "Submitted job #{job_id}"}
+    redirect(url("/projects/#{output_dir.split('/').last}"))
+  end
 end
