@@ -1,13 +1,205 @@
-<h1 class="display-4 py-3 mb-3 border-bottom">
-  <%= title %>
-</h1>
+<!-- I did a bit of researching, and it looks like the best way to set the number of rotations the cube should do is to set the number of degrees the cube should rotate in the keyframes. Some example code is shown below:
+  ```css
+  @keyframes ani {
+    from {
+      transform: rotateY(--rotY) rotateX(--rotX);
+    }
+    to {
+      transform: rotateY(--rotY2) rotateX(--rotX2);
+    }
+  }
+  ```
+-->
+<style>
+@keyframes ani {
+  from {
+    transform: rotateX(1turn) rotateY(1turn) rotateZ(1turn) scale(1)
+  }
+  25% {
+    transform: rotateX(1.25turn) rotateY(1.5turn) rotateZ(1.75turn) translateX(50vw) scale(1.5);
+  }
+  50% {
+    transform: rotateX(1.5turn) rotateY(2turn) rotateZ(2.5turn) scale(2) skew(10deg, -10deg);
+  }
+  75% {
+    transform: rotateX(1.75turn) rotateY(2.5turn) rotateZ(3.25turn) scale(0.5);
+  }
+  to {
+    transform: rotateX(2turn) rotateY(3turn) rotateZ(4turn) scale(1);
+  }
+}
+@keyframes allTheThings {
+  0% {
+    transform: scale(1);
+    background-color: hotpink;
+    text-shadow: 2px 2px 5px yellow;
+  }
+  25% {
+    transform: translateX(50vw) rotateY(180deg);
+    background-color: teal;
+    text-shadow: -2px -2px 5px purple;
+  }
+  50% {
+    transform: scale(2) skew(10deg, -10deg); /* Go wonky! */
+    background-color: orange;
+    animation: flicker 1s infinite alternate; /* Nested madness! */
+  }
+  75% {
+    transform: perspective(100px) rotateX(90deg); /* Dive into 3D! */
+    background-color: limegreen;
+    animation: pulse 2s infinite ease-in-out;
+  }
+  100% {
+    transform: scale(0.5) translateY(-100vh); /* Disappear off-screen! */
+    background-color: black;
+    color: white;
+    text-shadow: none;
+  }
+}
+.contaimer {
+  width: 50%;
+  height: 100%;
+  perspective: 1000px;
+  margin-right: auto;
+margin-left: auto;
+margin-top: 250px;
+margin-bottom: 250px;
+}
+
+.cube {
+  --rotX: 1rot;
+  --rotY: 1rot;
+  --rotZ: 0;
+  --rotX2: 2rot;
+  --rotY2: 2rot;
+  --rotZ2: 0;
+  position: relative;
+  width: 200px;
+  height: 200px;
+  transform-style: preserve-3d;
+  margin: auto;
+  animation: ani 8s cubic-bezier(0, 0.75, 1, 0.25) infinite;
+}
+
+
+.face {
+  width: 200px;
+  height: 200px;
+  background: skyblue;
+  border: 2px solid black;
+  position: absolute;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  transition: transform 500ms;
+  /*animation: flicker 0.5s infinite cubic-bezier(.3,1.29,1,.89);*/
+}
+
+.front {
+  transform: translateZ(100px);
+}
+
+.back {
+  transform: translateZ(-100px) rotateY(180deg);
+}
+
+.left {
+  transform: translateX(-100px) rotateY(-90deg);
+}
+
+.right {
+  transform: translateX(100px) rotateY(90deg);
+}
+
+.top {
+  transform: translateY(-100px) rotateX(90deg);
+}
+
+.bottom {
+  transform: translateY(100px) rotateX(-90deg);
+}
+
+
+
+#shadowBox {
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.2);
+    /* Black w/opacity/see-through */
+    border: 3px solid;
+}
+
+.rainbow {
+    text-align: center;
+    text-decoration: underline;
+    font-size: 32px;
+}
+.rainbow_text_animated {
+    background: linear-gradient(to right, #6666ff, #0099ff , #00ff00, #ff3399, #6666ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: rainbow_animation 1s linear infinite;
+    background-size: 400% 100%;
+}
+
+@keyframes rainbow_animation {
+    0%,100% {
+        background-position: 0 0;
+    }
+
+    50% {
+        background-position: 100% 0;
+    }
+}
+
+
+    .whee {
+    }
+
+    @keyframes x {
+      0%, 100% {
+        left: 0%;
+      }
+      50% {
+        left: 100%;
+      }
+    }
+
+    @keyframes y {
+      0%, 100% {
+      top: 0%;
+      }
+      50% {
+      top: 100%;
+      }
+
+
+      .aaaaa {
+        margin-bottom: 5000px;
+        padding-bottom: 5000px;
+
+      }
+
+</style>
+<div class="contaimer"> <div class="cube">
+  <div class="face front"><h1 class="rainbow rainbow_text_animated display-4 py-3 mb-3 border-bottom"><%= title %></h1></div>
+  <div class="face back"><h1 class="rainbow rainbow_text_animated display-4 py-3 mb-3 border-bottom"><%= title %></h1></div>
+  <div class="face top"><h1 class="rainbow rainbow_text_animated display-4 py-3 mb-3 border-bottom"><%= title %></h1></div>
+  <div class="face bottom"><h1 class="rainbow rainbow_text_animated display-4 py-3 mb-3 border-bottom"><%= title %></h1></div>
+  <div class="face left"><h1 class="rainbow rainbow_text_animated display-4 py-3 mb-3 border-bottom"><%= title %></h1></div>
+  <div class="face right"><h1 class="rainbow rainbow_text_animated display-4 py-3 mb-3 border-bottom"><%= title %></h1></div>
+  </div> </div>
 
 <h2 class="my-4">Projects</h2>
-
+<div class="aaaaa" style="margin-bottom:5000px;padding-bottom:5000px;">
 <div class='row my-5'>
   <ul class='list-group list-group-horizontal flex-wrap col-md-12'>
     <% project_dirs.each do |project| %>
-    <li class='list-group-item btn btn-outline-dark m-3 border'>
+    <li class='list-group-item btn btn-outline-dark m-3 border whee'>
       <div>
         <a href='<%= url("/projects/#{project}") %>' class="text-center">
           <i class='fas fa-fw fa-camera fa-5x'></i>
@@ -18,3 +210,114 @@
     <% end %>
   </ul>
 </div>
+</div>
+<small>hi :)</small>
+
+<script>
+function RandomObjectMover(obj, container) {
+	this.$object = obj;
+  this.$container = container;
+  this.container_is_window = container === window;
+  this.pixels_per_second = 1000;
+  this.current_position = { x: 0, y: 0 };
+  this.is_running = false;
+}
+
+// Set the speed of movement in Pixels per Second.
+RandomObjectMover.prototype.setSpeed = function(pxPerSec) {
+	this.pixels_per_second = pxPerSec;
+}
+
+RandomObjectMover.prototype._getContainerDimensions = function() {
+   if (this.$container === window) {
+       return { 'height' : this.$container.innerHeight * 2, 'width' : this.$container.innerWidth / 2 };
+   } else {
+   	   return { 'height' : this.$container.clientHeight * 2, 'width' : this.$container.clientWidth / 2 };
+   }
+}
+
+RandomObjectMover.prototype._generateNewPosition = function() {
+
+	// Get container dimensions minus div size
+  var containerSize = this._getContainerDimensions();
+	var availableHeight = containerSize.height - this.$object.clientHeight;
+  var availableWidth = containerSize.width - this.$object.clientHeight;
+    
+  // Pick a random place in the space
+  var y = Math.floor(Math.random() * availableHeight);
+  var x = Math.floor(Math.random() * availableWidth);
+    
+  return { x: x, y: y };    
+}
+
+RandomObjectMover.prototype._calcDelta = function(a, b) {
+	var dx   = a.x - b.x;         
+  var dy   = a.y - b.y;         
+  var dist = Math.sqrt( dx*dx + dy*dy ); 
+  return dist;
+}
+
+RandomObjectMover.prototype._moveOnce = function() {
+		// Pick a new spot on the page
+    var next = this._generateNewPosition();
+    
+    // How far do we have to move?
+    var delta = this._calcDelta(this.current_position, next);
+    
+		// Speed of this transition, rounded to 2DP
+		var speed = Math.round((delta / this.pixels_per_second) * 100) / 100;
+    
+    //console.log(this.current_position, next, delta, speed);
+          
+    this.$object.style.transition='transform '+speed+'s linear';
+    this.$object.style.transform='translate3d('+next.x+'px, '+next.y+'px, 0)';
+    
+    // Save this new position ready for the next call.
+    this.current_position = next;
+  
+};
+
+RandomObjectMover.prototype.start = function() {
+
+	if (this.is_running) {
+  	return;
+  }
+
+	// Make sure our object has the right css set
+  this.$object.willChange = 'transform';
+  this.$object.pointerEvents = 'auto';
+	
+  this.boundEvent = this._moveOnce.bind(this)
+  
+  // Bind callback to keep things moving
+  this.$object.addEventListener('transitionend', this.boundEvent);
+  
+  // Start it moving
+  this._moveOnce();
+  
+  this.is_running = true;
+}
+
+RandomObjectMover.prototype.stop = function() {
+
+	if (!this.is_running) {
+  	return;
+  }
+  
+  this.$object.removeEventListener('transitionend', this.boundEvent);
+  
+	this.is_running = false;
+}
+
+
+// Init it
+for (var i = 0; i < document.querySelectorAll('.whee').length; i++) {
+  new RandomObjectMover(document.querySelectorAll('.whee')[i], window).start();
+  
+}
+
+
+
+// Start it off
+
+  </script>
